@@ -17,7 +17,7 @@ public class TestTmall {
         }
 
         try (Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/tmall_springboot?useUnicode=true&characterEncoding=utf8", "root", "root");
+                "jdbc:mysql://localhost:3306/tmall_springboot?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8", "root", "root");
                 Statement s = c.createStatement();) {
             for (int i = 1; i <= 10; i++) {
                 String sqlFormat = "insert into category values (null, '测试分类%d')";
