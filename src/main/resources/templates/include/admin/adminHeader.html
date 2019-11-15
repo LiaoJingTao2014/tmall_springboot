@@ -4,11 +4,10 @@
 	<script src="js/bootstrap/3.3.6/bootstrap.min.js"></script>
 	<script src="js/vue/2.5.16/vue.min.js"></script>
 	<script src="js/axios/0.17.1/axios.min.js"></script>
-	<script src="js/moment/2.22.2/moment.js"></script> <!-- vue.js 格式化日期用的 -->
+	<script src="js/moment/2.22.2/moment.js"></script>
 	<link href="css/back/style.css" rel="stylesheet">
 	
 	<script>
-	//判断是否为空
 	function checkEmpty(value,text){
 		if(null==value || value.length==0){
 			alert(text+ "不能为空");
@@ -48,7 +47,6 @@
     
     //判断是否数字 (小数和整数)
 	function checkNumber(value, text){
-		
 		if(value.length==0){
 			alert(text+ "不能为空");
 			return false;
@@ -61,7 +59,6 @@
 	}
     //判断是否整数
 	function checkInt(value, text){
-		
 		if(value.length==0){
 			alert(text+ "不能为空");
 			return false;
