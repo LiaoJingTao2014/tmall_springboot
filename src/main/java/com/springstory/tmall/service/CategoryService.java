@@ -16,35 +16,35 @@ import com.springstory.tmall.util.Page4Navigator;
 @Service
 public class CategoryService {
     @Autowired
-    CategoryDAO categoryDAO;
+    CategoryDAO categoryDao;
 
     public List<Category> list() {
         Sort.Order order = new Sort.Order(Sort.Direction.DESC, "id");
-        return categoryDAO.findAll(Sort.by(order));
+        return categoryDao.findAll(Sort.by(order));
     }
 
     public Page4Navigator<Category> list(int start, int size, int navigatePages) {
         Sort.Order order = new Sort.Order(Sort.Direction.DESC, "id");
         Sort sort = Sort.by(order);
         Pageable pageable = PageRequest.of(start, size, sort);
-        Page<Category> pageFromJPA = categoryDAO.findAll(pageable);
+        Page<Category> pageFromJPA = categoryDao.findAll(pageable);
 
         return new Page4Navigator<>(pageFromJPA, navigatePages);
     }
 
     public void add(Category bean) {
-        categoryDAO.save(bean);
+        categoryDao.save(bean);
     }
 
     public void delete(int id) {
-        categoryDAO.deleteById(id);
+        categoryDao.deleteById(id);
     }
 
     public Category get(int id) {
-        return categoryDAO.getOne(id);
+        return categoryDao.getOne(id);
     }
 
     public void update(Category bean) {
-        categoryDAO.save(bean);
+        categoryDao.save(bean);
     }
 }
