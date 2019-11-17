@@ -13,11 +13,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.springframework.data.elasticsearch.annotations.Document;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "product")
 @JsonIgnoreProperties({ "handler", "hibernateLazyInitializer" })
+@Document(indexName = "tmall_springboot",type = "product")
 public class Product {
 
     @Id

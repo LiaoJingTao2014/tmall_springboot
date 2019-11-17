@@ -3,6 +3,9 @@ package com.springstory.tmall.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.springstory.tmall.dao.OrderItemDAO;
@@ -12,6 +15,7 @@ import com.springstory.tmall.pojo.Product;
 import com.springstory.tmall.pojo.User;
 
 @Service
+@CacheConfig(cacheNames = "orderItems")
 public class OrderItemService {
 
     @Autowired
@@ -39,6 +43,7 @@ public class OrderItemService {
         order.setTotalNumber(totalNumber);
     }
 
+    @Cacheable(key = "'orderItems-oid-'+ #p0.id")
     public List<OrderItem> listByOrder(Order order) {
         return orderItemDAO.findByOrderOrderByIdDesc(order);
     }
@@ -54,26 +59,32 @@ public class OrderItemService {
         return result;
     }
 
+    @Cacheable(key = "'orderItems-pid-'+ #p0.id")
     public List<OrderItem> listByProduct(Product product) {
         return orderItemDAO.findByProduct(product);
     }
 
+    @Cacheable(key = "'orderItems-uid-'+ #p0.id")
     public List<OrderItem> listByUser(User user) {
         return orderItemDAO.findByUserAndOrderIsNull(user);
     }
 
+    @CacheEvict(allEntries = true)
     public void add(OrderItem orderItem) {
         orderItemDAO.save(orderItem);
     }
 
+    @Cacheable(key = "'orderItems-one-'+ #p0")
     public OrderItem get(int id) {
         return orderItemDAO.getOne(id);
     }
 
+    @CacheEvict(allEntries = true)
     public void delete(int id) {
         orderItemDAO.deleteById(id);
     }
 
+    @CacheEvict(allEntries = true)
     public void update(OrderItem orderItem) {
         orderItemDAO.save(orderItem);
     }

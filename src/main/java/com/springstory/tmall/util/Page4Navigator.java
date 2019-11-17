@@ -94,14 +94,6 @@ public class Page4Navigator<T> {
         this.navigatepageNums = navigatepageNums;
     }
 
-    public Page<T> getPageFromJPA() {
-        return pageFromJPA;
-    }
-
-    public void setPageFromJPA(Page<T> pageFromJPA) {
-        this.pageFromJPA = pageFromJPA;
-    }
-
     public int getNavigatePages() {
         return navigatePages;
     }

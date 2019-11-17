@@ -3,19 +3,27 @@ package com.springstory.tmall.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
 import com.springstory.tmall.dao.ProductDAO;
+import com.springstory.tmall.es.ProductESDAO;
 import com.springstory.tmall.pojo.Category;
 import com.springstory.tmall.pojo.Product;
 import com.springstory.tmall.util.Page4Navigator;
 
 @Service
+@CacheConfig(cacheNames = "products")
 public class ProductService {
 
     @Autowired
@@ -33,22 +41,33 @@ public class ProductService {
     @Autowired
     ReviewService reviewService;
 
+    @Autowired
+    ProductESDAO productESDAO;
+
+    @CacheEvict(allEntries = true)
     public void add(Product bean) {
         productDao.save(bean);
+        productESDAO.save(bean);
     }
 
+    @CacheEvict(allEntries = true)
     public void delete(int id) {
         productDao.deleteById(id);
+        productESDAO.deleteById(id);
     }
 
+    @Cacheable(key = "'products-one-'+ #p0")
     public Product get(int id) {
         return productDao.getOne(id);
     }
 
+    @CacheEvict(allEntries = true)
     public void update(Product bean) {
         productDao.save(bean);
+        productESDAO.save(bean);
     }
 
+    @Cacheable(key = "'products-cid-'+#p0+'-page-'+#p1 + '-' + #p2 ")
     public Page4Navigator<Product> list(int cid, int start, int size, int navigatePages) {
         Category category = categoryService.get(cid);
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "id"));
@@ -85,6 +104,7 @@ public class ProductService {
         }
     }
 
+    @Cacheable(key = "'products-cid-'+ #p0.id")
     public List<Product> listByCategory(Category category) {
         return productDao.findByCategoryOrderById(category);
     }
@@ -104,10 +124,25 @@ public class ProductService {
     }
 
     public List<Product> search(String keyword, int start, int size) {
+        initDatabase2ES();
         Sort sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "id"));
         Pageable pageable = PageRequest.of(start, size, sort);
-        List<Product> products = productDao.findByNameLike("%" + keyword + "%", pageable);
 
-        return products;
+        QueryStringQueryBuilder builder = new QueryStringQueryBuilder(keyword);
+        SearchQuery searchQuery = new NativeSearchQueryBuilder().withPageable(pageable).withQuery(builder).build();
+        Page<Product> page = productESDAO.search(searchQuery);
+
+        return page.getContent();
+    }
+
+    private void initDatabase2ES() {
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Product> page = productESDAO.findAll(pageable);
+        if (page.getContent().isEmpty()) {
+            List<Product> products = productDao.findAll();
+            for (Product product : products) {
+                productESDAO.save(product);
+            }
+        }
     }
 }
