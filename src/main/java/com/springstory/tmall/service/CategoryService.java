@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.springstory.tmall.dao.CategoryDAO;
 import com.springstory.tmall.pojo.Category;
+import com.springstory.tmall.pojo.Product;
 import com.springstory.tmall.util.Page4Navigator;
 
 @Service
@@ -46,5 +47,29 @@ public class CategoryService {
 
     public void update(Category bean) {
         categoryDao.save(bean);
+    }
+
+    public void removeCategoryFromProduct(List<Category> cs) {
+        for (Category category : cs) {
+            removeCategoryFromProduct(category);
+        }
+    }
+
+    public void removeCategoryFromProduct(Category category) {
+        List<Product> products = category.getProducts();
+        if (null != products) {
+            for (Product product : products) {
+                product.setCategory(null);
+            }
+        }
+
+        List<List<Product>> productsByRow = category.getProductsByRow();
+        if (null != productsByRow) {
+            for (List<Product> ps : productsByRow) {
+                for (Product p : ps) {
+                    p.setCategory(null);
+                }
+            }
+        }
     }
 }

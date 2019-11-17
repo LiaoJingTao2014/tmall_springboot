@@ -57,7 +57,7 @@ public class AdminPageController {
     }
 
     @GetMapping(value = "/admin_order_list")
-    public String listOrder() {
+    public String listOrder() { 
         return "admin/listOrder";
     }
 
